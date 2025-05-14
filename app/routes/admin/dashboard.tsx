@@ -1,4 +1,5 @@
 import { StatsCard, TripCard } from 'components'
+import type { Route } from './+types/dashboard';
 import Header from 'components/Header'
 import React from 'react'
 import {
@@ -11,9 +12,16 @@ import {
 } from "@syncfusion/ej2-react-charts";
 import {ColumnDirective, ColumnsDirective, GridComponent, Inject} from "@syncfusion/ej2-react-grids";
 import {tripXAxis, tripyAxis, userXAxis, useryAxis} from "~/constants";
-import {dashboardStats, user, allTrips} from "~/constants";
+import {dashboardStats,  allTrips} from "~/constants";
+import { getUser } from '~/appwrite/auth';
 
-const Dashboard = () => {
+
+
+export const clientLoader = async () => await getUser();
+
+const Dashboard = ({ loaderData }: Route.ComponentProps) => {
+    const user = loaderData as User | null;
+    // const { dashboardStats, allTrips, userGrowth, tripsByTravelStyle, allUsers } = loaderData;
   
   return (
     <main className="dashboard wrapper">
