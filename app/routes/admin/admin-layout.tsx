@@ -23,23 +23,21 @@ export async function clientLoader() {
     }
 }
 
-
 const AdminLayout = () => {
-  return (
-    <div className="admin-layout">
-        <MobileSidebar />
+    return (
+        <div className="admin-layout">
+            <MobileSidebar />
 
-        <aside className="w-full max-w-[270px] hidden lg:block">
-            <SidebarComponent width={270} enableGestures={false}>
-                <NavItems />
-            </SidebarComponent>
-        </aside>
+            <aside className="w-full max-w-[270px] hidden lg:block">
+                <SidebarComponent width={270} enableGestures={false}>
+                    <NavItems />
+                </SidebarComponent>
+            </aside>
 
-        <aside className="children">
-            <Outlet />
-        </aside>
-    </div>
-)
+            <aside className="children">
+                <Outlet />
+            </aside>
+        </div>
+    )
 }
-
 export default AdminLayout

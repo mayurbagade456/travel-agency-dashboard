@@ -11,7 +11,16 @@ Sentry.init({
  sendDefaultPii: true,
  
  integrations: [
+   Sentry.reactRouterTracingIntegration(),
+   Sentry.replayIntegration(),
  ],
+ tracesSampleRate: 1.0, //  Capture 100% of the transactions
+ // Set `tracePropagationTargets` to declare which URL(s) should have trace propagation enabled
+ tracePropagationTargets: [/^\//, /^https:\/\/yourserver\.io\/api/],
+ // Capture Replay for 10% of all sessions,
+ // plus 100% of sessions with an error
+ replaysSessionSampleRate: 0.1,
+ replaysOnErrorSampleRate: 1.0,
 });
 
 startTransition(() => {

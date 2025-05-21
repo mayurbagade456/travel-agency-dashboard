@@ -1,7 +1,9 @@
-import { StatsCard, TripCard } from 'components'
+import {Header, StatsCard, TripCard} from "../../../components";
+import {getAllUsers, getUser} from "~/appwrite/auth";
 import type { Route } from './+types/dashboard';
-import Header from 'components/Header'
-import React from 'react'
+import {getTripsByTravelStyle, getUserGrowthPerDay, getUsersAndTripsStats} from "~/appwrite/dashboard";
+import {getAllTrips} from "~/appwrite/trips";
+import {parseTripData} from "~/lib/utils";
 import {
     Category,
     ChartComponent,
@@ -12,19 +14,75 @@ import {
 } from "@syncfusion/ej2-react-charts";
 import {ColumnDirective, ColumnsDirective, GridComponent, Inject} from "@syncfusion/ej2-react-grids";
 import {tripXAxis, tripyAxis, userXAxis, useryAxis} from "~/constants";
-import {dashboardStats,  allTrips} from "~/constants";
-import { getUser } from '~/appwrite/auth';
+import {redirect} from "react-router";
 
+export const clientLoader = async () => {
+    const [
+        user,
+        dashboardStats,
+        trips,
+        userGrowth,
+        tripsByTravelStyle,
+        allUsers,
+    ] = await Promise.all([
+        await getUser(),
+        await getUsersAndTripsStats(),
+        await getAllTrips(4, 0),
+        await getUserGrowthPerDay(),
+        await getTripsByTravelStyle(),
+        await getAllUsers(4, 0),
+    ])
 
+    const allTrips = trips.allTrips.map(({ $id, tripDetails, imageUrls }) => ({
+        id: $id,
+        ...parseTripData(tripDetails),
+        imageUrls: imageUrls ?? []
+    }))
 
-export const clientLoader = async () => await getUser();
+    const mappedUsers: UsersItineraryCount[] = allUsers.users.map((user) => ({
+        imageUrl: user.imageUrl,
+        name: user.name,
+        count: user.itineraryCount ?? Math.floor(Math.random() * 10),
+    }))
+
+    return {
+        user,
+        dashboardStats,
+        allTrips,
+        userGrowth,
+        tripsByTravelStyle,
+        allUsers: mappedUsers
+    }
+}
+
 
 const Dashboard = ({ loaderData }: Route.ComponentProps) => {
-    const user = loaderData as User | null;
-    // const { dashboardStats, allTrips, userGrowth, tripsByTravelStyle, allUsers } = loaderData;
-  
-  return (
-    <main className="dashboard wrapper">
+    const user = loaderData.user as User | null;
+    const { dashboardStats, allTrips, userGrowth, tripsByTravelStyle, allUsers } = loaderData;
+
+    const trips = allTrips.map((trip) => ({
+        imageUrl: trip.imageUrls[0],
+        name: trip.name,
+        interest: trip.interests,
+    }))
+
+    const usersAndTrips = [
+        {
+            title: 'Latest user signups',
+            dataSource: allUsers,
+            field: 'count',
+            headerText: 'Trips created'
+        },
+        {
+            title: 'Trips based on interests',
+            dataSource: trips,
+            field: 'interest',
+            headerText: 'Interests'
+        }
+    ]
+
+    return (
+        <main className="dashboard wrapper">
             <Header
                 title={`Welcome ${user?.name ?? 'Guest'} 👋`}
                 description="Track activity, trends and popular destinations in real time"
@@ -63,18 +121,14 @@ const Dashboard = ({ loaderData }: Route.ComponentProps) => {
                             name={trip.name!}
                             imageUrl={trip.imageUrls[0]}
                             location={trip.itinerary?.[0]?.location ?? ''}
-                            tags={trip.tags}
-                            // tags={[trip.interests!, trip.travelStyle!]}
+                            tags={[trip.interests!, trip.travelStyle!]}
                             price={trip.estimatedPrice!}
                         />
                     ))}
                 </div>
             </section>
 
-
-
-
-            {/* <section className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <section className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                 <ChartComponent
                     id="chart-1"
                     primaryXAxis={userXAxis}
@@ -160,14 +214,8 @@ const Dashboard = ({ loaderData }: Route.ComponentProps) => {
                         </GridComponent>
                     </div>
                 ))}
-            </section> */}
-
-
-
-
-
-            </main>
-  )
+            </section>
+        </main>
+    )
 }
-
 export default Dashboard
