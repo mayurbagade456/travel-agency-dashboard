@@ -3,15 +3,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-  
-  "dev": "react-router dev",
-  "start": "react-router-serve ./build/server/index.js",
-  "build": "react-router build",
-  "typecheck": "react-router typegen && tsc"
-
-
-},
-
+    "dev": "react-router dev",
+    "start": "react-router-serve ./build/server/index.js",
+    "build": "react-router build",
+    "typecheck": "react-router typegen && tsc"
+  },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "@react-router/node": "^7.6.0",
@@ -28,7 +24,7 @@
     "@syncfusion/ej2-react-maps": "^29.2.4",
     "@syncfusion/ej2-react-navigations": "^29.2.4",
     "@syncfusion/ej2-react-splitbuttons": "^29.2.4",
-    "appwrite": "^18.0.0",
+    "appwrite": "^17.0.2",
     "canvas-confetti": "^1.9.3",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
